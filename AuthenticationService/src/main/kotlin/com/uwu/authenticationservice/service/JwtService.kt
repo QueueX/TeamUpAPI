@@ -1,5 +1,6 @@
 package com.uwu.authenticationservice.service
 
+import com.uwu.authenticationservice.dto.MemberData
 import com.uwu.authenticationservice.entity.UserEntity
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import java.security.Key
 import java.util.*
 import java.util.function.Function
+import kotlin.collections.HashMap
 
 @Service
 class JwtService {
@@ -26,7 +28,18 @@ class JwtService {
 
     fun getSingInKey(): Key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSigningKey))
 
-    fun generateToken(userDetails: UserEntity) = generateToken(HashMap(), userDetails)
+    fun generateToken(userDetails: UserEntity): String {
+
+        val header = HashMap<String, Any>()
+        header["typ"] = "JWT" // установить тип токена
+        header["alg"] = "HS256" // установить алгоритм подписи
+
+        val claims = HashMap<String, Any>()
+        claims["isActivated"] = userDetails.isActivated!!
+        claims["role"] = userDetails.role.toString()
+
+        return generateToken(header, claims, userDetails)
+    }
 
     fun isTokenValid(token: String, userDetails: UserDetails): Boolean {
         val username = extractUsername(token)
@@ -37,10 +50,13 @@ class JwtService {
 
     private fun extractExpiration(token: String): Date = extractClaim(token, Claims::getExpiration)
 
-    fun generateToken(extraClaims: Map<String, Any>, userDetails: UserDetails): String =
-        Jwts.builder().addClaims(extraClaims).setSubject(userDetails.username)
+    fun generateToken(header: Map<String, Any>, claims: Map<String, Any>, userDetails: UserDetails): String =
+        Jwts.builder()
+            .setHeader(header)
+            .setSubject(userDetails.username)
+            .addClaims(claims)
             .setIssuedAt(Date(System.currentTimeMillis()))
-            .setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 24))
+            .setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 10))
             .signWith(getSingInKey(), SignatureAlgorithm.HS256)
             .compact()
 

@@ -18,15 +18,12 @@ class SecurityConfiguration {
         http.csrf { obj: AbstractHttpConfigurer<*, *> -> obj.disable() }
             .authorizeHttpRequests { authorizationManagerRequestMatcherRegistry ->
                 authorizationManagerRequestMatcherRegistry
-//                    .requestMatchers(
-//                        "/api/authentication/**",
-//                        "/swagger-ui.html",
-//                        "/swagger-ui/**",
-//                        "/v3/api-docs",
-//                        "/doc",
-//                        "/doc/**"
-//                    )
-                    .requestMatchers("**")
+                    .requestMatchers(
+                        "/api/authentication/**",
+                        "/v3/api-docs",
+                        "/doc",
+                        "/doc/**"
+                    )
                     .permitAll()
                     .anyRequest()
                     .authenticated()
