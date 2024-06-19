@@ -30,7 +30,7 @@ springdoc:
   swagger-ui:
     config-url: /v3/api-docs
     url: /v3/api-docs
-    path: /doc
+    path: /doc/index.html
 
 server:
   port: 8080
