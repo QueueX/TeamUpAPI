@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: AuthenticationService
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/TeamUp
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: my.teamup.platform@gmail.com
+    password: pkfqcauuhwmitfzg
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+springdoc:
+  swagger-ui:
+    config-url: /v3/api-docs
+    url: /v3/api-docs
+    path: /doc
+
+server:
+  port: 8080
+
+token:
+  secret:
+    key: aEJngisbX3ZhpiMn/GgZws1/QftesQZi9EC/5Uwf+as=

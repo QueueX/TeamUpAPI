@@ -10,8 +10,5 @@
         <module name="AuthenticationService.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="AuthenticationService" target="21" />
-    </bytecodeTargetLevel>
   </component>
 </project>
