@@ -1,6 +1,5 @@
 package com.uwu.authenticationservice.service
 
-import com.uwu.authenticationservice.dto.MemberData
 import com.uwu.authenticationservice.entity.UserEntity
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -9,6 +8,8 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.userdetails.UserDetails
 import java.security.Key
 import java.util.*
@@ -20,6 +21,7 @@ class JwtService {
 
     @Value("\${token.secret.key}")
     private val jwtSigningKey = ""
+    private val logger: Logger = LoggerFactory.getLogger(JwtService::class.java)
 
     fun extractUsername(token: String): String = extractClaim(token, Claims::getSubject)
 
@@ -29,15 +31,16 @@ class JwtService {
     fun getSingInKey(): Key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSigningKey))
 
     fun generateToken(userDetails: UserEntity): String {
-
+        logger.info("Beginning of generate token")
         val header = HashMap<String, Any>()
-        header["typ"] = "JWT" // установить тип токена
-        header["alg"] = "HS256" // установить алгоритм подписи
+        header["typ"] = "JWT"
+        header["alg"] = "HS256"
 
         val claims = HashMap<String, Any>()
         claims["isActivated"] = userDetails.isActivated!!
         claims["role"] = userDetails.role.toString()
 
+        logger.debug("Token for ${userDetails.email} has been generated")
         return generateToken(header, claims, userDetails)
     }
 

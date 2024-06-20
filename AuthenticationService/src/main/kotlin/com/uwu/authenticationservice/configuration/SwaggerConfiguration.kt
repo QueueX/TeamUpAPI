@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.info.Info
 @OpenAPIDefinition(
     info = Info(
         title = "Authentication Service",
-        description = "Сервис Аутентификации", version = "1.0.0"
+        description = "Сервис Аутентификации", version = "1.1.0"
     )
 )
 class SwaggerConfiguration {

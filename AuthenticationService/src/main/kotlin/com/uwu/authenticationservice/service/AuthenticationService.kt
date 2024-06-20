@@ -9,6 +9,8 @@ import com.uwu.authenticationservice.request.RegistrationRequest
 import com.uwu.authenticationservice.response.AuthenticationResponse
 import jakarta.mail.internet.AddressException
 import jakarta.mail.internet.InternetAddress
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -24,13 +26,17 @@ class AuthenticationService(
     private val mailService: MailService,
     private val passwordEncoder: PasswordEncoder
 ) {
+    private val logger: Logger = LoggerFactory.getLogger(AuthenticationService::class.java)
 
     fun authorization(request: AuthenticationRequest): Any {
+        logger.info("Request to authorization")
         try {
             if (request.email.isNotEmpty() && request.password.isNotEmpty() && isValidEmailAddress(request.email)
             ) {
                 authenticationManager.authenticate(UsernamePasswordAuthenticationToken(request.email, request.password))
                 val user = userRepository.findByEmail(request.email).orElseThrow()
+                logger.debug("User ${user.email} is authorized")
+                logger.info("Authorization is successful!")
                 return ResponseEntity(
                     AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
                         this.email = user.email
@@ -40,9 +46,14 @@ class AuthenticationService(
                     HttpStatus.OK
                 )
             } else {
-                return ResponseEntity(mapOf("message" to "Поля логин и/или пароль какого-то хуя пустые"), HttpStatus.BAD_REQUEST)
+                logger.error("Поля логин и/или пароль какого-то хуя пустые")
+                return ResponseEntity(
+                    mapOf("message" to "Поля логин и/или пароль какого-то хуя пустые"),
+                    HttpStatus.BAD_REQUEST
+                )
             }
         } catch (ex: Exception) {
+            logger.error("Error authorization: $ex")
             return ResponseEntity(
                 mapOf("message" to "Неверные логин и/или пароль"),
                 HttpStatus.BAD_REQUEST
@@ -51,6 +62,7 @@ class AuthenticationService(
     }
 
     fun registration(request: RegistrationRequest): Any {
+        logger.info("Request to registration")
         try {
             if (request.email.isNotEmpty() && request.password.isNotEmpty() && request.name.isNotEmpty() &&
                 request.lastname.isNotEmpty() && isValidEmailAddress(request.email)) {
@@ -58,10 +70,13 @@ class AuthenticationService(
                 val emails = userRepository.findAllEmails()
 
                 emails.forEach { email ->
-                    if (request.email == email) return ResponseEntity(
-                        mapOf("message" to "Пользователь с таким email уже существует"),
-                        HttpStatus.BAD_REQUEST
-                    )
+                    if (request.email == email) {
+                        logger.error("Error of registration: User with email ${request.email} is already exist")
+                        return ResponseEntity(
+                            mapOf("message" to "Пользователь с таким email уже существует"),
+                            HttpStatus.BAD_REQUEST
+                        )
+                    }
                 }
 
                 val user = UserEntity().apply {
@@ -74,6 +89,8 @@ class AuthenticationService(
                 }
 
                 userRepository.save(user)
+                logger.debug("User with email ${user.email} has been created")
+                logger.info("Registration is successful!")
                 return ResponseEntity(
                     AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
                         this.email = user.email
@@ -84,33 +101,48 @@ class AuthenticationService(
                 )
 
             } else {
+                logger.error("Data is empty")
                 return ResponseEntity(
                     mapOf("message" to "Заполнены не все данные!!!"),
                     HttpStatus.BAD_REQUEST
                 )
             }
         } catch (ex: Exception) {
+            logger.error("Error of registration: $ex")
             return ResponseEntity(
-                mapOf("message" to "Что то пошло не так хз"),
+                mapOf("error" to ex.toString()),
                 HttpStatus.BAD_REQUEST
             )
         }
     }
 
     fun refresh(token: String): Any {
-        return try {
+        logger.info("Request to refresh token")
+        try {
             if (token.isNotEmpty()) {
                 val user = userRepository.findByEmail(jwtService.extractUsername(token.substring(7))).orElseThrow()
-                AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
-                    this.email = user.email
-                    this.isActivated = user.isActivated
-                    this.role = user.role
-                })
+                logger.debug("token of user ${user.email} is refreshed")
+                return ResponseEntity(
+                    AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
+                        this.email = user.email
+                        this.isActivated = user.isActivated
+                        this.role = user.role
+                    }),
+                    HttpStatus.OK
+                )
             } else {
-                ResponseEntity.badRequest()
+                logger.error("Token is empty")
+                return ResponseEntity(
+                    mapOf("error" to "Token is empty"),
+                    HttpStatus.BAD_REQUEST
+                )
             }
         } catch (ex: Exception) {
-            ResponseEntity.badRequest()
+            logger.error("Error of refresh token")
+            return ResponseEntity(
+                mapOf("error" to ex.toString()),
+                HttpStatus.BAD_REQUEST
+            )
         }
     }
 
