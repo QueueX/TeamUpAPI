@@ -1,9 +1,12 @@
 package com.uwu.authenticationservice.service
 
+import com.uwu.authenticationservice.dto.MemberData
 import com.uwu.authenticationservice.entity.MailVerifyEntity
 import com.uwu.authenticationservice.repository.MailVerifyRepository
 import com.uwu.authenticationservice.repository.UserRepository
 import com.uwu.authenticationservice.request.MailVerifyRequest
+import com.uwu.authenticationservice.response.MailVerifyResponse
+import com.uwu.authenticationservice.response.SimpleResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.mail.SimpleMailMessage
@@ -21,7 +24,7 @@ class MailService(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(MailService::class.java)
 
-    fun sendVerificationCode(token: String) {
+    fun sendVerificationCode(token: String): SimpleResponse {
         logger.info("Generation verification code")
         val email = jwtService.extractUsername(token.substring(7))
         var verificationCode = ""
@@ -37,10 +40,11 @@ class MailService(
         mailVerifyRepository.save(mailVerification)
 
         sendMailVerificationMessage(email)
+        return SimpleResponse("Код был отправлен на почту $email")
     }
 
     @Transactional
-    fun verifyByCode(token: String, mailVerifyRequest: MailVerifyRequest) {
+    fun verifyByCode(token: String, mailVerifyRequest: MailVerifyRequest): MailVerifyResponse {
         val email = jwtService.extractUsername(token.substring(7))
         val mailVerify = mailVerifyRepository.getMailVerificationEntityByEmail(email)
 
@@ -56,6 +60,14 @@ class MailService(
 
         mailVerifyRepository.delete(mailVerify)
         logger.info("Verification successful")
+
+        return MailVerifyResponse("Верификация ${user.email} прошла успешно", jwtService.generateToken(user),
+            MemberData().apply {
+                this.email = user.email
+                this.isActivated = user.isActivated
+                this.role = user.role
+            }
+        )
     }
 
     private fun sendMailVerificationMessage(to: String) {

@@ -1,6 +1,8 @@
 package com.uwu.authenticationservice.controller
 
 import com.uwu.authenticationservice.request.MailVerifyRequest
+import com.uwu.authenticationservice.response.MailVerifyResponse
+import com.uwu.authenticationservice.response.SimpleResponse
 import com.uwu.authenticationservice.service.MailService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -22,10 +24,9 @@ class MailVerifyController(
 
     @PostMapping("/send-code")
     @Operation(summary = "Генерация и отправка кода верификации на почту клиента")
-    fun sendVerificationCode(@RequestHeader(value = "Authorization") token: String): ResponseEntity<Map<String, String>> {
+    fun sendVerificationCode(@RequestHeader(value = "Authorization") token: String): ResponseEntity<SimpleResponse> {
         logger.info("Request to sending verification code")
-        mailService.sendVerificationCode(token)
-        return ResponseEntity.ok(mapOf("message" to "Verification code has been sent"))
+        return ResponseEntity.ok(mailService.sendVerificationCode(token))
     }
 
     @PostMapping("/verify")
@@ -33,10 +34,9 @@ class MailVerifyController(
     fun verifyByCode(
         @RequestHeader(value = "Authorization") token: String,
         @RequestBody request: MailVerifyRequest
-    ): ResponseEntity<Map<String, String>> {
+    ): ResponseEntity<MailVerifyResponse> {
         logger.info("Request to verify")
-        mailService.verifyByCode(token, request)
-        return ResponseEntity.ok(mapOf("message" to "User has been activated"))
+        return ResponseEntity.ok(mailService.verifyByCode(token, request))
     }
 
     @ExceptionHandler
