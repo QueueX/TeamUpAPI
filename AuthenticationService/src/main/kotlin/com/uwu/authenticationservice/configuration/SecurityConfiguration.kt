@@ -28,7 +28,8 @@ class SecurityConfiguration(
                 authorizationManagerRequestMatcherRegistry
                     .requestMatchers(
                         "/api/authentication/refresh",
-                        "/api/authentication/email/**"
+                        "/api/authentication/email/**",
+                        "api/who-am-i"
                     )
                     .authenticated()
                     .requestMatchers(
