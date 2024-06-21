@@ -11,19 +11,17 @@ import jakarta.mail.internet.AddressException
 import jakarta.mail.internet.InternetAddress
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AuthenticationService(
     private val userRepository: UserRepository,
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager,
-    private val mailService: MailService,
     private val passwordEncoder: PasswordEncoder
 ) {
     private val logger: Logger = LoggerFactory.getLogger(AuthenticationService::class.java)
@@ -46,7 +44,7 @@ class AuthenticationService(
             })
     }
 
-
+    @Transactional
     fun registration(request: RegistrationRequest): AuthenticationResponse {
         if (!isValidRegistrationCredentials(request)) {
             logger.error("Data is empty")

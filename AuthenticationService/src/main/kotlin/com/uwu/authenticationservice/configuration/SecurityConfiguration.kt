@@ -27,7 +27,8 @@ class SecurityConfiguration(
             .authorizeHttpRequests { authorizationManagerRequestMatcherRegistry ->
                 authorizationManagerRequestMatcherRegistry
                     .requestMatchers(
-                        "/api/authentication/refresh"
+                        "/api/authentication/refresh",
+                        "/api/authentication/email/**"
                     )
                     .authenticated()
                     .requestMatchers(
