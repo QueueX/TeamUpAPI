@@ -46,6 +46,7 @@ class JwtService {
 
     fun isTokenValid(token: String, userDetails: UserDetails): Boolean {
         val username = extractUsername(token)
+        if (isTokenExpired(token)) throw Exception("Срок действия токена истек")
         return username == userDetails.username && !isTokenExpired(token)
     }
 
@@ -64,7 +65,7 @@ class JwtService {
             .compact()
 
     private fun extractAllClaims(token: String): Claims =
-        Jwts
+         Jwts
             .parserBuilder()
             .setSigningKey(getSingInKey())
             .build()

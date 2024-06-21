@@ -2,9 +2,14 @@ package com.uwu.authenticationservice.controller
 
 import com.uwu.authenticationservice.request.AuthenticationRequest
 import com.uwu.authenticationservice.request.RegistrationRequest
+import com.uwu.authenticationservice.response.AuthenticationResponse
 import com.uwu.authenticationservice.service.AuthenticationService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -21,14 +26,21 @@ import org.springframework.web.bind.annotation.RestController
 class AuthenticationController(
     private val authenticationService: AuthenticationService
 ) {
+    private val logger: Logger = LoggerFactory.getLogger(AuthenticationController::class.java)
 
     @PostMapping("/authorization")
     @Operation(summary = "Авторизация пользователя")
-    fun authorization(@RequestBody request: AuthenticationRequest) = authenticationService.authorization(request)
+    fun authorization(@RequestBody request: AuthenticationRequest): ResponseEntity<AuthenticationResponse> {
+        logger.info("Request to authorization")
+        return ResponseEntity.ok(authenticationService.authorization(request))
+    }
 
     @PostMapping("/registration")
-    @Operation(summary = "Регистрация пользователя"    )
-    fun registration(@RequestBody request: RegistrationRequest) = authenticationService.registration(request)
+    @Operation(summary = "Регистрация пользователя")
+    fun registration(@RequestBody request: RegistrationRequest): ResponseEntity<AuthenticationResponse> {
+        logger.info("Request to registration")
+        return ResponseEntity.ok(authenticationService.registration(request))
+    }
 
     @GetMapping("/refresh")
     @Operation(
@@ -37,6 +49,15 @@ class AuthenticationController(
                 "используется чтобы обновлять токен. Токен живет 10 минут, потому я ОООООЧЕНЬ рекомендую кидать туда " +
                 "запрос после КАЖДОГО действия на сайте. Благо все что нужно - наличие заголовка с токеном"
     )
-    fun refresh(@RequestHeader(value = "Authorization") token: String) = authenticationService.refresh(token)
+    fun refresh(@RequestHeader(value = "Authorization") token: String): ResponseEntity<AuthenticationResponse> {
+        logger.info("Request to refresh token")
+        return ResponseEntity.ok(authenticationService.refresh(token))
+    }
+
+    @ExceptionHandler
+    fun handleException(ex: Exception) : ResponseEntity<*> {
+        logger.error("Exception: $ex")
+        return ResponseEntity.badRequest().body(mapOf("error" to "${ex.message}"))
+    }
 
 }

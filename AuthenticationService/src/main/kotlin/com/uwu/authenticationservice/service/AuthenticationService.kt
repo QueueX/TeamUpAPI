@@ -28,138 +28,79 @@ class AuthenticationService(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(AuthenticationService::class.java)
 
-    fun authorization(request: AuthenticationRequest): Any {
-        logger.info("Request to authorization")
-        try {
-            if (request.email.isNotEmpty() && request.password.isNotEmpty() && isValidEmailAddress(request.email)
-            ) {
-                authenticationManager.authenticate(UsernamePasswordAuthenticationToken(request.email, request.password))
-                val user = userRepository.findByEmail(request.email).orElseThrow()
-                logger.debug("User ${user.email} is authorized")
-                logger.info("Authorization is successful!")
-                return ResponseEntity(
-                    AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
-                        this.email = user.email
-                        this.isActivated = user.isActivated
-                        this.role = user.role
-                    }),
-                    HttpStatus.OK
-                )
-            } else {
-                logger.error("Поля логин и/или пароль какого-то хуя пустые")
-                return ResponseEntity(
-                    mapOf("message" to "Поля логин и/или пароль какого-то хуя пустые"),
-                    HttpStatus.BAD_REQUEST
-                )
-            }
-        } catch (ex: Exception) {
-            logger.error("Error authorization: $ex")
-            return ResponseEntity(
-                mapOf("message" to "Неверные логин и/или пароль"),
-                HttpStatus.BAD_REQUEST
-            )
+    fun authorization(request: AuthenticationRequest): AuthenticationResponse {
+        if (!isValidAuthenticationCredentials(request)) {
+            logger.error("Поля логин и/или пароль какого-то хуя пустые")
+            throw Exception("Поля логин и/или пароль какого-то хуя пустые")
         }
+        authenticationManager.authenticate(UsernamePasswordAuthenticationToken(request.email, request.password))
+        val user = userRepository.findByEmail(request.email)
+        logger.debug("User ${user.email} is authorized")
+        logger.info("Authorization is successful!")
+        return AuthenticationResponse(
+            jwtService.generateToken(user),
+            MemberData().apply {
+                this.email = user.email
+                this.isActivated = user.isActivated
+                this.role = user.role
+            })
     }
 
-    fun registration(request: RegistrationRequest): Any {
-        logger.info("Request to registration")
-        try {
-            if (request.email.isNotEmpty() && request.password.isNotEmpty() && request.name.isNotEmpty() &&
-                request.lastname.isNotEmpty() && isValidEmailAddress(request.email)) {
 
-                val emails = userRepository.findAllEmails()
-
-                emails.forEach { email ->
-                    if (request.email == email) {
-                        logger.error("Error of registration: User with email ${request.email} is already exist")
-                        return ResponseEntity(
-                            mapOf("message" to "Пользователь с таким email уже существует"),
-                            HttpStatus.BAD_REQUEST
-                        )
-                    }
-                }
-
-                val user = UserEntity().apply {
-                    this.email = request.email
-                    this.authPassword = passwordEncoder.encode(request.password)
-                    this.name = request.name
-                    this.lastname = request.lastname
-                    this.isActivated = false
-                    this.role = Role.USER
-                }
-
-                userRepository.save(user)
-                logger.debug("User with email ${user.email} has been created")
-                logger.info("Registration is successful!")
-                return ResponseEntity(
-                    AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
-                        this.email = user.email
-                        this.isActivated = user.isActivated
-                        this.role = user.role
-                    }),
-                    HttpStatus.OK
-                )
-
-            } else {
-                logger.error("Data is empty")
-                return ResponseEntity(
-                    mapOf("message" to "Заполнены не все данные!!!"),
-                    HttpStatus.BAD_REQUEST
-                )
-            }
-        } catch (ex: Exception) {
-            logger.error("Error of registration: $ex")
-            return ResponseEntity(
-                mapOf("error" to ex.toString()),
-                HttpStatus.BAD_REQUEST
-            )
+    fun registration(request: RegistrationRequest): AuthenticationResponse {
+        if (!isValidRegistrationCredentials(request)) {
+            logger.error("Data is empty")
+            throw Exception("Заполнены не все данные!!!")
         }
+
+        val emails = userRepository.findAllEmails()
+
+        emails.forEach { email ->
+            if (request.email == email) {
+                logger.error("Error of registration: User with email ${request.email} is already exist")
+                throw Exception("Пользователь с таким email уже существует")
+            }
+        }
+
+        val user = UserEntity().apply {
+            this.email = request.email
+            this.authPassword = passwordEncoder.encode(request.password)
+            this.name = request.name
+            this.lastname = request.lastname
+            this.isActivated = false
+            this.role = Role.USER
+        }
+
+        userRepository.save(user)
+        logger.debug("User with email ${user.email} has been created")
+        logger.info("Registration is successful!")
+        return AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
+            this.email = user.email
+            this.isActivated = user.isActivated
+            this.role = user.role
+        })
     }
 
-    fun refresh(token: String): Any {
-        logger.info("Request to refresh token")
-        try {
-            if (token.isNotEmpty()) {
-                val user = userRepository.findByEmail(jwtService.extractUsername(token.substring(7))).orElseThrow()
-                logger.debug("token of user ${user.email} is refreshed")
-                return ResponseEntity(
-                    AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
-                        this.email = user.email
-                        this.isActivated = user.isActivated
-                        this.role = user.role
-                    }),
-                    HttpStatus.OK
-                )
-            } else {
-                logger.error("Token is empty")
-                return ResponseEntity(
-                    mapOf("error" to "Token is empty"),
-                    HttpStatus.BAD_REQUEST
-                )
-            }
-        } catch (ex: Exception) {
-            logger.error("Error of refresh token")
-            return ResponseEntity(
-                mapOf("error" to ex.toString()),
-                HttpStatus.BAD_REQUEST
-            )
+    fun refresh(token: String): AuthenticationResponse {
+        if (token.isEmpty()) {
+            logger.error("Token is empty")
+            throw Exception("Token is empty")
         }
+        val user = userRepository.findByEmail(jwtService.extractUsername(token.substring(7)))
+        logger.debug("Token of user ${user.email} is refreshed")
+        return AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
+            this.email = user.email
+            this.isActivated = user.isActivated
+            this.role = user.role
+        })
     }
 
-//    fun verify(uuid: String): Any {
-//        return try {
-//            val user = userRepository.findUserEntityById(uuid)
-//            user.isActivated = true
-//            userRepository.save(user)
-//            ResponseEntity(mapOf("verify" to "success"), HttpStatus.OK)
-//        } catch (ex: Exception) {
-//            ResponseEntity(mapOf("verify" to "failed"), HttpStatus.BAD_REQUEST)
-//        }
-//    }
-//
-//    fun repeatVerify(): Any {
-//        return 10
-//    }
+    private fun isValidAuthenticationCredentials(request: AuthenticationRequest) =
+        request.email.isNotEmpty() && request.password.isNotEmpty() && isValidEmailAddress(request.email)
+
+    private fun isValidRegistrationCredentials(request: RegistrationRequest) =
+        request.email.isNotEmpty() && request.password.isNotEmpty() && request.name.isNotEmpty() &&
+                request.lastname.isNotEmpty() && isValidEmailAddress(request.email)
 
     private fun isValidEmailAddress(email: String?): Boolean {
         try {
