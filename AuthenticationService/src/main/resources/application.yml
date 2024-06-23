@@ -3,12 +3,12 @@ spring:
     name: AuthenticationService
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/TeamUp
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://my-teamup.ru:5432/TeamUp
+    username: TeamUp
+    password: guewhprihdfjhsargoheusdweufhui2389yf2uy892f3
     driver-class-name: org.postgresql.Driver
   mail:
     host: smtp.gmail.com
