@@ -7,8 +7,18 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.32/17d46b3e205515e1e8efd3ee4d57ce8018914163/lombok-1.18.32.jar" />
         </processorPath>
-        <module name="AuthenticationService.main" />
+        <module name="TeamUpApi.AuthenticationService.main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="EurekaServer" target="21" />
+      <module name="EurekaServer.main" target="21" />
+      <module name="EurekaServer.test" target="21" />
+      <module name="TeamUpApi.Eureka-Server" target="21" />
+      <module name="TeamUpApi.Eureka-Server.main" target="21" />
+      <module name="TeamUpApi.Eureka-Server.test" target="21" />
+      <module name="TeamUpApi.EurekaServer.main" target="21" />
+      <module name="TeamUpApi.EurekaServer.test" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>
