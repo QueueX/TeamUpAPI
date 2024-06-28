@@ -1,11 +1,42 @@
 version: '3'
 
 services:
+  eureka-server:
+    build:
+      dockerfile: ./Dockerfile
+      context: Eureka-Server
+    image: eureka-server
+    container_name: eureka-server
+    networks:
+      - backend
+    ports:
+      - "8761:8761"
+
   auth-service:
     build:
       dockerfile: ./Dockerfile
       context: AuthenticationService
     image: auth-service
     container_name: auth-service
+    depends_on:
+      - eureka-server
+    networks:
+      - backend
+    ports:
+      - "8081:8081"
+
+  gateway:
+    build:
+      dockerfile: ./Dockerfile
+      context: TeamUp-Gateway
+    image: gateway
+    container_name: gateway
+    depends_on:
+      - auth-service
+    networks:
+      - backend
     ports:
       - "8080:8080"
+
+networks:
+  backend:

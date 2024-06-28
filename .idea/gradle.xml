@@ -4,10 +4,13 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/AuthenticationService" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/AuthenticationService" />
+            <option value="$PROJECT_DIR$/Eureka-Server" />
+            <option value="$PROJECT_DIR$/TeamUp-Gateway" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -1,7 +1,6 @@
 package com.uwu.authenticationservice.configuration
 
 import com.uwu.authenticationservice.service.JwtService
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
@@ -29,18 +28,20 @@ class SecurityConfiguration(
                     .requestMatchers(
                         "/api/authentication/refresh",
                         "/api/authentication/email/**",
-                        "api/who-am-i"
+                        "/api/authentication/who-am-i"
                     )
                     .authenticated()
-                    .requestMatchers(
-                        "/api/authentication/**",
-                        "/v3/api-docs",
-                        "/swagger-ui.html",
-                        "/swagger-ui/**"
-                    )
-                    .permitAll()
+//                    .requestMatchers(
+//                        "/api/authentication/**",
+//                        "/v3/api-docs",
+//                        "/swagger-ui.html",
+//                        "/swagger-ui/**"
+//                    )
+//                    .permitAll()
+//                    .anyRequest()
+//                    .authenticated()
                     .anyRequest()
-                    .authenticated()
+                    .permitAll()
             }
             .httpBasic(Customizer.withDefaults())
             .sessionManagement { httpSecuritySessionManagementConfigurer ->

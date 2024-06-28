@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/whoami")
+@RequestMapping("/api/authentication/whoami")
 @Tag(
     name = "WhoAmI",
     description = "Полная инфа об аутентифицированном пользователе"

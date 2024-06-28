@@ -1,4 +1,4 @@
-package com.uwu.authenticationservice
+package com.uwu.teamupgateway
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -6,8 +6,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient
 
 @SpringBootApplication
 @EnableDiscoveryClient
-class AuthenticationServiceApplication
+class TeamUpGatewayApplication
 
 fun main(args: Array<String>) {
-	runApplication<AuthenticationServiceApplication>(*args)
+    runApplication<TeamUpGatewayApplication>(*args)
 }
