@@ -1,4 +1,5 @@
 rootProject.name="TeamUpApi"
 
 include("AuthenticationService")
-include("EurekaServer")
+include("Eureka-Server")
+include("TeamUp-Gateway")

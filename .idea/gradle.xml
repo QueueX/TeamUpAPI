@@ -9,23 +9,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/AuthenticationService" />
-            <option value="$PROJECT_DIR$/EurekaServer" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/AuthenticationService" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/AuthenticationService" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/Eureka-Server" />
-        <option name="modules">
-          <set>
             <option value="$PROJECT_DIR$/Eureka-Server" />
+            <option value="$PROJECT_DIR$/TeamUp-Gateway" />
           </set>
         </option>
       </GradleProjectSettings>

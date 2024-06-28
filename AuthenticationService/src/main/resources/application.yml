@@ -26,14 +26,14 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8081/eureka
+      defaultZone: http://eureka-server:8761/eureka
 
 logging:
   level:
     web: debug
 
 server:
-  port: 8080
+  port: 8081
 
 token:
   secret:

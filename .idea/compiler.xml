@@ -10,13 +10,19 @@
         <module name="TeamUpApi.AuthenticationService.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="21">
+      <module name="AuthenticationService" target="21" />
+      <module name="AuthenticationService.main" target="21" />
+      <module name="AuthenticationService.test" target="21" />
+      <module name="com.uwu.TeamUp-Gateway" target="21" />
+      <module name="com.uwu.TeamUp-Gateway.main" target="21" />
+      <module name="com.uwu.TeamUp-Gateway.test" target="21" />
+      <module name="Eureka-Server" target="21" />
+      <module name="Eureka-Server.main" target="21" />
+      <module name="Eureka-Server.test" target="21" />
       <module name="EurekaServer" target="21" />
       <module name="EurekaServer.main" target="21" />
       <module name="EurekaServer.test" target="21" />
-      <module name="TeamUpApi.Eureka-Server" target="21" />
-      <module name="TeamUpApi.Eureka-Server.main" target="21" />
-      <module name="TeamUpApi.Eureka-Server.test" target="21" />
       <module name="TeamUpApi.EurekaServer.main" target="21" />
       <module name="TeamUpApi.EurekaServer.test" target="21" />
     </bytecodeTargetLevel>
