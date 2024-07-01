@@ -7,6 +7,7 @@ import com.uwu.authenticationservice.repository.UserRepository
 import com.uwu.authenticationservice.request.MailVerifyRequest
 import com.uwu.authenticationservice.response.MailVerifyResponse
 import com.uwu.authenticationservice.response.SimpleResponse
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.mail.SimpleMailMessage
@@ -20,7 +21,8 @@ class MailService(
     private val mailSender: JavaMailSender,
     private val mailVerifyRepository: MailVerifyRepository,
     private val jwtService: JwtService,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val authenticationService: AuthenticationService
 ) {
     private val logger: Logger = LoggerFactory.getLogger(MailService::class.java)
 
@@ -44,7 +46,7 @@ class MailService(
     }
 
     @Transactional
-    fun verifyByCode(token: String, mailVerifyRequest: MailVerifyRequest): MailVerifyResponse {
+    fun verifyByCode(token: String, mailVerifyRequest: MailVerifyRequest, response: HttpServletResponse): MailVerifyResponse {
         val email = jwtService.extractUsername(token.substring(7))
         val mailVerify = mailVerifyRepository.getMailVerificationEntityByEmail(email)
 
@@ -63,6 +65,8 @@ class MailService(
 
         val tokens = jwtService.generateTokens(user)
         user.refreshToken = tokens[1]
+        userRepository.save(user)
+        authenticationService.setRefreshToken(response, user)
 
         return MailVerifyResponse(
             "Верификация ${user.email} прошла успешно",

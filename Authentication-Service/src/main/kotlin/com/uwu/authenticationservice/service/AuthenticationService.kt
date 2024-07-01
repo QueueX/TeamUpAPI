@@ -9,6 +9,8 @@ import com.uwu.authenticationservice.request.RegistrationRequest
 import com.uwu.authenticationservice.response.AuthenticationResponse
 import jakarta.mail.internet.AddressException
 import jakarta.mail.internet.InternetAddress
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
@@ -27,7 +29,7 @@ class AuthenticationService(
     private val logger: Logger = LoggerFactory.getLogger(AuthenticationService::class.java)
 
     @Transactional
-    fun authorization(request: AuthenticationRequest): AuthenticationResponse {
+    fun authorization(request: AuthenticationRequest, response: HttpServletResponse): AuthenticationResponse {
         if (!isValidAuthenticationCredentials(request)) {
             logger.error("Поля логин и/или пароль какого-то хуя пустые")
             throw Exception("Поля логин и/или пароль какого-то хуя пустые")
@@ -41,6 +43,7 @@ class AuthenticationService(
 
         user.refreshToken = tokens[1]
         userRepository.save(user)
+        setRefreshToken(response, user)
 
         return AuthenticationResponse(
             tokens[0],
@@ -52,7 +55,7 @@ class AuthenticationService(
     }
 
     @Transactional
-    fun registration(request: RegistrationRequest): Pair<AuthenticationResponse, UserEntity> {
+    fun registration(request: RegistrationRequest, response: HttpServletResponse): AuthenticationResponse {
         if (!isValidRegistrationCredentials(request)) {
             logger.error("Data is empty")
             throw Exception("Заполнены не все данные!!!")
@@ -80,6 +83,7 @@ class AuthenticationService(
         val tokens = jwtService.generateTokens(user)
         user.refreshToken = tokens[1]
         userRepository.save(user)
+        setRefreshToken(response, user)
 
         logger.debug("User with email ${user.email} has been created")
         logger.info("Registration is successful!")
@@ -89,11 +93,11 @@ class AuthenticationService(
                 this.email = user.email
                 this.isActivated = user.isActivated
                 this.role = user.role
-            }) to user
+            })
     }
 
     @Transactional
-    fun refresh(token: String): Pair<AuthenticationResponse, UserEntity> {
+    fun refresh(token: String, response: HttpServletResponse): AuthenticationResponse {
         if (token.isEmpty()) {
             logger.error("Token is empty")
             throw Exception("Token is empty")
@@ -108,6 +112,8 @@ class AuthenticationService(
 
         val tokens = jwtService.generateTokens(user)
         user.refreshToken = tokens[1]
+        userRepository.save(user)
+        setRefreshToken(response, user)
 
         logger.debug("Token of user ${user.email} is refreshed")
         return AuthenticationResponse(
@@ -116,7 +122,17 @@ class AuthenticationService(
                 this.email = user.email
                 this.isActivated = user.isActivated
                 this.role = user.role
-            }) to user
+            })
+    }
+
+    fun setRefreshToken(response: HttpServletResponse, user: UserEntity) {
+        val cookie = Cookie("refreshToken", user.refreshToken)
+        cookie.isHttpOnly = true
+        cookie.secure = true
+        cookie.path = "/"
+        cookie.maxAge = 30 * 24 * 60 * 60 // 30 дней
+
+        response.addCookie(cookie)
     }
 
     private fun isValidAuthenticationCredentials(request: AuthenticationRequest) =
