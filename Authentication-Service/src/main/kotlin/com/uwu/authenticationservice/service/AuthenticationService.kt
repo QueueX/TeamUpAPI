@@ -7,6 +7,7 @@ import com.uwu.authenticationservice.repository.UserRepository
 import com.uwu.authenticationservice.request.AuthenticationRequest
 import com.uwu.authenticationservice.request.RegistrationRequest
 import com.uwu.authenticationservice.response.AuthenticationResponse
+import com.uwu.authenticationservice.response.SimpleResponse
 import jakarta.mail.internet.AddressException
 import jakarta.mail.internet.InternetAddress
 import jakarta.servlet.http.Cookie
@@ -94,6 +95,18 @@ class AuthenticationService(
                 this.isActivated = user.isActivated
                 this.role = user.role
             })
+    }
+
+    fun logout(token: String, response: HttpServletResponse): SimpleResponse {
+        val user = userRepository.findByEmail(jwtService.extractUsername(token))
+        user.refreshToken = null
+
+        val cookie = Cookie("refreshToken", null)
+        cookie.maxAge = 0
+        cookie.path = "/"
+        response.addCookie(cookie)
+
+        return SimpleResponse("Logout successful")
     }
 
     @Transactional
