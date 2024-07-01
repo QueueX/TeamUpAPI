@@ -61,7 +61,12 @@ class MailService(
         mailVerifyRepository.delete(mailVerify)
         logger.info("Verification successful")
 
-        return MailVerifyResponse("Верификация ${user.email} прошла успешно", jwtService.generateToken(user),
+        val tokens = jwtService.generateTokens(user)
+        user.refreshToken = tokens[1]
+
+        return MailVerifyResponse(
+            "Верификация ${user.email} прошла успешно",
+            tokens[0],
             MemberData().apply {
                 this.email = user.email
                 this.isActivated = user.isActivated

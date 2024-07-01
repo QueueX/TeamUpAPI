@@ -6,9 +6,12 @@ import com.uwu.authenticationservice.response.AuthenticationResponse
 import com.uwu.authenticationservice.service.AuthenticationService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -37,9 +40,20 @@ class AuthenticationController(
 
     @PostMapping("/registration")
     @Operation(summary = "Регистрация пользователя")
-    fun registration(@RequestBody request: RegistrationRequest): ResponseEntity<AuthenticationResponse> {
+    fun registration(@RequestBody request: RegistrationRequest, response: HttpServletResponse): ResponseEntity<AuthenticationResponse> {
         logger.info("Request to registration")
-        return ResponseEntity.ok(authenticationService.registration(request))
+
+        val (authenticationResponse, user) = authenticationService.registration(request)
+
+        val cookie = Cookie("refreshToken", user.refreshToken)
+        cookie.isHttpOnly = true
+        cookie.secure = true
+        cookie.path = "/"
+        cookie.maxAge = 30 * 24 * 60 * 60 // 30 дней
+
+        response.addCookie(cookie)
+
+        return ResponseEntity.ok(authenticationResponse)
     }
 
     @GetMapping("/refresh")
@@ -49,9 +63,19 @@ class AuthenticationController(
                 "используется чтобы обновлять токен. Токен живет 10 минут, потому я ОООООЧЕНЬ рекомендую кидать туда " +
                 "запрос после КАЖДОГО действия на сайте. Благо все что нужно - наличие заголовка с токеном"
     )
-    fun refresh(@RequestHeader(value = "Authorization") token: String): ResponseEntity<AuthenticationResponse> {
+    fun refresh(@CookieValue(value = "refreshToken") token: String, response: HttpServletResponse): ResponseEntity<AuthenticationResponse> {
         logger.info("Request to refresh token")
-        return ResponseEntity.ok(authenticationService.refresh(token))
+        val (authenticationResponse, user) = authenticationService.refresh(token)
+
+        val cookie = Cookie("refreshToken", user.refreshToken)
+        cookie.isHttpOnly = true
+        cookie.secure = true
+        cookie.path = "/"
+        cookie.maxAge = 30 * 24 * 60 * 60 // 30 дней
+
+        response.addCookie(cookie)
+
+        return ResponseEntity.ok(authenticationResponse)
     }
 
     @ExceptionHandler

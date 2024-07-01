@@ -13,7 +13,7 @@ class GatewayConfiguration {
         return builder.routes()
             .route("authentication-service") { r ->
                 r.path("/api/authentication/**")
-                    .uri("lb://authenticationservice")
+                    .uri("lb://authentication-service")
             }
             .build()
     }

@@ -26,6 +26,7 @@ class AuthenticationService(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(AuthenticationService::class.java)
 
+    @Transactional
     fun authorization(request: AuthenticationRequest): AuthenticationResponse {
         if (!isValidAuthenticationCredentials(request)) {
             logger.error("Поля логин и/или пароль какого-то хуя пустые")
@@ -35,8 +36,14 @@ class AuthenticationService(
         val user = userRepository.findByEmail(request.email)
         logger.debug("User ${user.email} is authorized")
         logger.info("Authorization is successful!")
+
+        val tokens = jwtService.generateTokens(user)
+
+        user.refreshToken = tokens[1]
+        userRepository.save(user)
+
         return AuthenticationResponse(
-            jwtService.generateToken(user),
+            tokens[0],
             MemberData().apply {
                 this.email = user.email
                 this.isActivated = user.isActivated
@@ -45,7 +52,7 @@ class AuthenticationService(
     }
 
     @Transactional
-    fun registration(request: RegistrationRequest): AuthenticationResponse {
+    fun registration(request: RegistrationRequest): Pair<AuthenticationResponse, UserEntity> {
         if (!isValidRegistrationCredentials(request)) {
             logger.error("Data is empty")
             throw Exception("Заполнены не все данные!!!")
@@ -67,30 +74,49 @@ class AuthenticationService(
             this.lastname = request.lastname
             this.isActivated = false
             this.role = Role.USER
+            this.refreshToken = null
         }
 
+        val tokens = jwtService.generateTokens(user)
+        user.refreshToken = tokens[1]
         userRepository.save(user)
+
         logger.debug("User with email ${user.email} has been created")
         logger.info("Registration is successful!")
-        return AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
-            this.email = user.email
-            this.isActivated = user.isActivated
-            this.role = user.role
-        })
+        return AuthenticationResponse(
+            tokens[0],
+            MemberData().apply {
+                this.email = user.email
+                this.isActivated = user.isActivated
+                this.role = user.role
+            }) to user
     }
 
-    fun refresh(token: String): AuthenticationResponse {
+    @Transactional
+    fun refresh(token: String): Pair<AuthenticationResponse, UserEntity> {
         if (token.isEmpty()) {
             logger.error("Token is empty")
             throw Exception("Token is empty")
         }
-        val user = userRepository.findByEmail(jwtService.extractUsername(token.substring(7)))
+
+        val user = userRepository.findByEmail(jwtService.extractUsername(token))
+
+        if (user.refreshToken != token) {
+            logger.error("")
+            throw Exception("Token not valid")
+        }
+
+        val tokens = jwtService.generateTokens(user)
+        user.refreshToken = tokens[1]
+
         logger.debug("Token of user ${user.email} is refreshed")
-        return AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
-            this.email = user.email
-            this.isActivated = user.isActivated
-            this.role = user.role
-        })
+        return AuthenticationResponse(
+            tokens[0],
+            MemberData().apply {
+                this.email = user.email
+                this.isActivated = user.isActivated
+                this.role = user.role
+            }) to user
     }
 
     private fun isValidAuthenticationCredentials(request: AuthenticationRequest) =
