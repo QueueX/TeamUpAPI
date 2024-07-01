@@ -7,8 +7,11 @@ import com.uwu.authenticationservice.repository.UserRepository
 import com.uwu.authenticationservice.request.AuthenticationRequest
 import com.uwu.authenticationservice.request.RegistrationRequest
 import com.uwu.authenticationservice.response.AuthenticationResponse
+import com.uwu.authenticationservice.response.SimpleResponse
 import jakarta.mail.internet.AddressException
 import jakarta.mail.internet.InternetAddress
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
@@ -26,7 +29,8 @@ class AuthenticationService(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(AuthenticationService::class.java)
 
-    fun authorization(request: AuthenticationRequest): AuthenticationResponse {
+    @Transactional
+    fun authorization(request: AuthenticationRequest, response: HttpServletResponse): AuthenticationResponse {
         if (!isValidAuthenticationCredentials(request)) {
             logger.error("Поля логин и/или пароль какого-то хуя пустые")
             throw Exception("Поля логин и/или пароль какого-то хуя пустые")
@@ -35,8 +39,15 @@ class AuthenticationService(
         val user = userRepository.findByEmail(request.email)
         logger.debug("User ${user.email} is authorized")
         logger.info("Authorization is successful!")
+
+        val tokens = jwtService.generateTokens(user)
+
+        user.refreshToken = tokens[1]
+        userRepository.save(user)
+        setRefreshToken(response, user)
+
         return AuthenticationResponse(
-            jwtService.generateToken(user),
+            tokens[0],
             MemberData().apply {
                 this.email = user.email
                 this.isActivated = user.isActivated
@@ -45,7 +56,7 @@ class AuthenticationService(
     }
 
     @Transactional
-    fun registration(request: RegistrationRequest): AuthenticationResponse {
+    fun registration(request: RegistrationRequest, response: HttpServletResponse): AuthenticationResponse {
         if (!isValidRegistrationCredentials(request)) {
             logger.error("Data is empty")
             throw Exception("Заполнены не все данные!!!")
@@ -67,30 +78,74 @@ class AuthenticationService(
             this.lastname = request.lastname
             this.isActivated = false
             this.role = Role.USER
+            this.refreshToken = null
         }
 
+        val tokens = jwtService.generateTokens(user)
+        user.refreshToken = tokens[1]
         userRepository.save(user)
+        setRefreshToken(response, user)
+
         logger.debug("User with email ${user.email} has been created")
         logger.info("Registration is successful!")
-        return AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
-            this.email = user.email
-            this.isActivated = user.isActivated
-            this.role = user.role
-        })
+        return AuthenticationResponse(
+            tokens[0],
+            MemberData().apply {
+                this.email = user.email
+                this.isActivated = user.isActivated
+                this.role = user.role
+            })
     }
 
-    fun refresh(token: String): AuthenticationResponse {
+    fun logout(token: String, response: HttpServletResponse): SimpleResponse {
+        val user = userRepository.findByEmail(jwtService.extractUsername(token))
+        user.refreshToken = null
+
+        val cookie = Cookie("refreshToken", null)
+        cookie.maxAge = 0
+        cookie.path = "/"
+        response.addCookie(cookie)
+
+        return SimpleResponse("Logout successful")
+    }
+
+    @Transactional
+    fun refresh(token: String, response: HttpServletResponse): AuthenticationResponse {
         if (token.isEmpty()) {
             logger.error("Token is empty")
             throw Exception("Token is empty")
         }
-        val user = userRepository.findByEmail(jwtService.extractUsername(token.substring(7)))
+
+        val user = userRepository.findByEmail(jwtService.extractUsername(token))
+
+        if (user.refreshToken != token) {
+            logger.error("")
+            throw Exception("Token not valid")
+        }
+
+        val tokens = jwtService.generateTokens(user)
+        user.refreshToken = tokens[1]
+        userRepository.save(user)
+        setRefreshToken(response, user)
+
         logger.debug("Token of user ${user.email} is refreshed")
-        return AuthenticationResponse(jwtService.generateToken(user), MemberData().apply {
-            this.email = user.email
-            this.isActivated = user.isActivated
-            this.role = user.role
-        })
+        return AuthenticationResponse(
+            tokens[0],
+            MemberData().apply {
+                this.email = user.email
+                this.isActivated = user.isActivated
+                this.role = user.role
+            })
+    }
+
+    fun setRefreshToken(response: HttpServletResponse, user: UserEntity) {
+        val cookie = Cookie("refreshToken", user.refreshToken)
+        cookie.isHttpOnly = true
+        cookie.secure = true
+        cookie.path = "/"
+        cookie.maxAge = 30 * 24 * 60 * 60 // 30 дней
+
+        response.addCookie(cookie)
     }
 
     private fun isValidAuthenticationCredentials(request: AuthenticationRequest) =

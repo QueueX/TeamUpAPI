@@ -6,6 +6,7 @@ import com.uwu.authenticationservice.response.SimpleResponse
 import com.uwu.authenticationservice.service.MailService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
@@ -33,10 +34,11 @@ class MailVerifyController(
     @Operation(summary = "Верификация пользователя по коду")
     fun verifyByCode(
         @RequestHeader(value = "Authorization") token: String,
-        @RequestBody request: MailVerifyRequest
+        @RequestBody request: MailVerifyRequest,
+        response: HttpServletResponse
     ): ResponseEntity<MailVerifyResponse> {
         logger.info("Request to verify")
-        return ResponseEntity.ok(mailService.verifyByCode(token, request))
+        return ResponseEntity.ok(mailService.verifyByCode(token, request, response))
     }
 
     @ExceptionHandler

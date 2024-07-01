@@ -1,6 +1,6 @@
 spring:
   application:
-    name: AuthenticationService
+    name: Authentication-Service
   jpa:
     hibernate:
       ddl-auto: update

@@ -27,6 +27,9 @@ class UserEntity : UserDetails {
     @Enumerated(EnumType.STRING)
     var role: Role? = null
 
+    @Column(unique = true, nullable = true)
+    var refreshToken: String? = null
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> =
         mutableListOf(SimpleGrantedAuthority(role?.name))
 

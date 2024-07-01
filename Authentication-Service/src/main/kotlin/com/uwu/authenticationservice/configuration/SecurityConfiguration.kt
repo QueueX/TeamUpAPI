@@ -26,20 +26,10 @@ class SecurityConfiguration(
             .authorizeHttpRequests { authorizationManagerRequestMatcherRegistry ->
                 authorizationManagerRequestMatcherRegistry
                     .requestMatchers(
-                        "/api/authentication/refresh",
                         "/api/authentication/email/**",
                         "/api/authentication/who-am-i"
                     )
                     .authenticated()
-//                    .requestMatchers(
-//                        "/api/authentication/**",
-//                        "/v3/api-docs",
-//                        "/swagger-ui.html",
-//                        "/swagger-ui/**"
-//                    )
-//                    .permitAll()
-//                    .anyRequest()
-//                    .authenticated()
                     .anyRequest()
                     .permitAll()
             }

@@ -8,7 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/AuthenticationService" />
+            <option value="$PROJECT_DIR$/Authentication-Service" />
             <option value="$PROJECT_DIR$/Eureka-Server" />
             <option value="$PROJECT_DIR$/TeamUp-Gateway" />
           </set>
