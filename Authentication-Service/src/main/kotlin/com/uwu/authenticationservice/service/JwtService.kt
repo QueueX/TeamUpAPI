@@ -30,18 +30,20 @@ class JwtService {
 
     fun getSingInKey(): Key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSigningKey))
 
-    fun generateToken(userDetails: UserEntity): String {
+    fun generateTokens(userDetails: UserEntity): ArrayList<String> {
         logger.info("Beginning of generate token")
         val header = HashMap<String, Any>()
         header["typ"] = "JWT"
         header["alg"] = "HS256"
 
-        val claims = HashMap<String, Any>()
-        claims["isActivated"] = userDetails.isActivated!!
-        claims["role"] = userDetails.role.toString()
+        logger.debug("Tokens for ${userDetails.email} has been generated")
 
-        logger.debug("Token for ${userDetails.email} has been generated")
-        return generateToken(header, claims, userDetails)
+        val tokens = ArrayList<String>()
+
+        tokens.add(generateAccessToken(header, userDetails))
+        tokens.add(generateRefreshToken(header, userDetails))
+
+        return tokens
     }
 
     fun isTokenValid(token: String, userDetails: UserDetails): Boolean {
@@ -54,13 +56,23 @@ class JwtService {
 
     private fun extractExpiration(token: String): Date = extractClaim(token, Claims::getExpiration)
 
-    fun generateToken(header: Map<String, Any>, claims: Map<String, Any>, userDetails: UserDetails): String =
+    private fun generateAccessToken(header: Map<String, Any>, userDetails: UserDetails): String =
         Jwts.builder()
             .setHeader(header)
             .setSubject(userDetails.username)
-            .addClaims(claims)
+            .addClaims(HashMap())
             .setIssuedAt(Date(System.currentTimeMillis()))
             .setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 10))
+            .signWith(getSingInKey(), SignatureAlgorithm.HS256)
+            .compact()
+
+    private fun generateRefreshToken(header: Map<String, Any>, userDetails: UserDetails): String =
+        Jwts.builder()
+            .setHeader(header)
+            .setSubject(userDetails.username)
+            .addClaims(HashMap())
+            .setIssuedAt(Date(System.currentTimeMillis()))
+            .setExpiration(Date(System.currentTimeMillis() + 1000.toLong() * 60 * 60 * 24 * 30))
             .signWith(getSingInKey(), SignatureAlgorithm.HS256)
             .compact()
 
