@@ -1,6 +1,17 @@
 version: '3'
 
 services:
+  flyway:
+    build:
+      dockerfile: ./Dockerfile
+      context: Migration-Service
+    image: flyway
+    container_name: flyway
+    networks:
+      - backend
+    ports:
+      - "8100:8100"
+
   eureka-server:
     build:
       dockerfile: ./Dockerfile

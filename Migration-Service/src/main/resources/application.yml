@@ -6,3 +6,6 @@ spring:
     username: TeamUp
     password: guewhprihdfjhsargoheusdweufhui2389yf2uy892f3
     driver-class-name: org.postgresql.Driver
+
+server:
+  port: 8100
