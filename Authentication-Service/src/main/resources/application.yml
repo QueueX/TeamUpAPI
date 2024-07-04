@@ -2,8 +2,6 @@ spring:
   application:
     name: Authentication-Service
   jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: true
   datasource:
     url: jdbc:postgresql://my-teamup.ru:5432/TeamUp
