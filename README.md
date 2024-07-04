@@ -5,6 +5,6 @@
 - Kotlin 2.0.0
 - Spring Framework (Boot, DataJPA, Cloud)
 - PostgreSQL
-- GitHub Actions (CI/CD)
+- Flyway Database Migration
 - Docker
 - Swagger v3
