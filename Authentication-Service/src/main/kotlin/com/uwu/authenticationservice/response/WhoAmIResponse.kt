@@ -1,6 +1,7 @@
 package com.uwu.authenticationservice.response
 
 import com.uwu.authenticationservice.entity.Role
+import com.uwu.authenticationservice.entity.UserEntity
 import java.util.UUID
 
 data class WhoAmIResponse(
@@ -10,4 +11,15 @@ data class WhoAmIResponse(
     var lastname: String?,
     var isActivated: Boolean?,
     var role: Role?
-)
+) {
+    companion object {
+        fun of(record: UserEntity) =
+            WhoAmIResponse(
+                record.id,
+                record.email,
+                record.name,
+                record.lastname,
+                record.isActivated,
+                record.role)
+    }
+}

@@ -1,38 +1,29 @@
 package com.uwu.authenticationservice.entity
 
 import jakarta.persistence.*
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
 import java.util.UUID
 
 @Entity
-@Table(name = "users")
-class UserEntity : UserDetails {
+@Table(name = "\"Users\"")
+class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null
 
-    var name: String? = null
-    var lastname: String? = null
+    lateinit var name: String
+    lateinit var lastname: String
 
     @Column(unique = true)
-    var email: String? = null
+    lateinit var email: String
     var isActivated: Boolean? = null
 
-    @Column(name = "password")
-    var authPassword: String? = null
+    lateinit var password: String
 
     @Enumerated(EnumType.STRING)
-    var role: Role? = null
+    lateinit var role: Role
 
     @Column(unique = true, nullable = true)
     var refreshToken: String? = null
 
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority> =
-        mutableListOf(SimpleGrantedAuthority(role?.name))
-
-    override fun getPassword() = this.authPassword
-    override fun getUsername() = this.email
 }

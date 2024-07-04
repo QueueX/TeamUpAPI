@@ -2,14 +2,14 @@ package com.uwu.authenticationservice.entity
 
 import jakarta.persistence.*
 
-@Entity(name = "verification_code")
+@Entity(name = "Verification_Codes")
 class MailVerifyEntity {
 
     @Id
     @Column(unique = true)
-    var email: String? = null
+    lateinit var email: String
 
-    @Column(length = 6)
-    var verificationCode: String? = null
+    @Column(name = "verification_code", length = 6)
+    lateinit var verificationCode: String
 
 }

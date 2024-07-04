@@ -1,6 +1,7 @@
 package com.uwu.authenticationservice.service
 
 import com.uwu.authenticationservice.dto.MemberData
+import com.uwu.authenticationservice.dto.User
 import com.uwu.authenticationservice.entity.MailVerifyEntity
 import com.uwu.authenticationservice.repository.MailVerifyRepository
 import com.uwu.authenticationservice.repository.UserRepository
@@ -63,19 +64,15 @@ class MailService(
         mailVerifyRepository.delete(mailVerify)
         logger.info("Verification successful")
 
-        val tokens = jwtService.generateTokens(user)
+        val userDetails = User.of(user)
+
+        val tokens = jwtService.generateTokens(userDetails)
         user.refreshToken = tokens[1]
         userRepository.save(user)
         authenticationService.setRefreshToken(response, user)
 
         return MailVerifyResponse(
-            "Верификация ${user.email} прошла успешно",
-            tokens[0],
-            MemberData().apply {
-                this.email = user.email
-                this.isActivated = user.isActivated
-                this.role = user.role
-            }
+            "Верификация ${user.email} прошла успешно", tokens[0], MemberData.of(user)
         )
     }
 

@@ -1,5 +1,6 @@
 package com.uwu.authenticationservice.configuration
 
+import com.uwu.authenticationservice.dto.User
 import com.uwu.authenticationservice.repository.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,7 +19,7 @@ class ApplicationConfiguration (
     @Bean
     fun userDetailsService(): UserDetailsService? {
         return UserDetailsService { email: String ->
-            userRepository.findByEmail(email)
+            User.of(userRepository.findByEmail(email))
         }
     }
 

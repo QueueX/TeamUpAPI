@@ -1,6 +1,7 @@
 package com.uwu.authenticationservice.service
 
 import com.uwu.authenticationservice.dto.MemberData
+import com.uwu.authenticationservice.dto.User
 import com.uwu.authenticationservice.entity.Role
 import com.uwu.authenticationservice.entity.UserEntity
 import com.uwu.authenticationservice.repository.UserRepository
@@ -40,19 +41,15 @@ class AuthenticationService(
         logger.debug("User ${user.email} is authorized")
         logger.info("Authorization is successful!")
 
-        val tokens = jwtService.generateTokens(user)
+        val userDetails = User.of(user)
+
+        val tokens = jwtService.generateTokens(userDetails)
 
         user.refreshToken = tokens[1]
         userRepository.save(user)
         setRefreshToken(response, user)
 
-        return AuthenticationResponse(
-            tokens[0],
-            MemberData().apply {
-                this.email = user.email
-                this.isActivated = user.isActivated
-                this.role = user.role
-            })
+        return AuthenticationResponse(tokens[0], MemberData.of(user))
     }
 
     @Transactional
@@ -73,7 +70,7 @@ class AuthenticationService(
 
         val user = UserEntity().apply {
             this.email = request.email
-            this.authPassword = passwordEncoder.encode(request.password)
+            this.password = passwordEncoder.encode(request.password)
             this.name = request.name
             this.lastname = request.lastname
             this.isActivated = false
@@ -81,20 +78,17 @@ class AuthenticationService(
             this.refreshToken = null
         }
 
-        val tokens = jwtService.generateTokens(user)
+        val userDetails = User.of(user)
+
+        val tokens = jwtService.generateTokens(userDetails)
         user.refreshToken = tokens[1]
         userRepository.save(user)
         setRefreshToken(response, user)
 
         logger.debug("User with email ${user.email} has been created")
         logger.info("Registration is successful!")
-        return AuthenticationResponse(
-            tokens[0],
-            MemberData().apply {
-                this.email = user.email
-                this.isActivated = user.isActivated
-                this.role = user.role
-            })
+
+        return AuthenticationResponse(tokens[0], MemberData.of(user))
     }
 
     fun logout(token: String, response: HttpServletResponse): SimpleResponse {
@@ -123,19 +117,16 @@ class AuthenticationService(
             throw Exception("Token not valid")
         }
 
-        val tokens = jwtService.generateTokens(user)
+        val userDetails = User.of(user)
+
+        val tokens = jwtService.generateTokens(userDetails)
         user.refreshToken = tokens[1]
         userRepository.save(user)
         setRefreshToken(response, user)
 
         logger.debug("Token of user ${user.email} is refreshed")
-        return AuthenticationResponse(
-            tokens[0],
-            MemberData().apply {
-                this.email = user.email
-                this.isActivated = user.isActivated
-                this.role = user.role
-            })
+
+        return AuthenticationResponse(tokens[0], MemberData.of(user))
     }
 
     fun setRefreshToken(response: HttpServletResponse, user: UserEntity) {

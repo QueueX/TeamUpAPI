@@ -16,13 +16,6 @@ class WhoAmIService(
     fun whoAmI(token: String): WhoAmIResponse {
         val user = userRepository.findByEmail(jwtService.extractUsername(token.substring(7)))
         logger.info("WhoAmI for user ${user.email} has been returned")
-        return WhoAmIResponse(
-            id = user.id,
-            email = user.email,
-            name = user.name,
-            lastname = user.lastname,
-            isActivated = user.isActivated,
-            role = user.role
-        )
+        return WhoAmIResponse.of(user)
     }
 }

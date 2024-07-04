@@ -1,5 +1,6 @@
 package com.uwu.authenticationservice.service
 
+import com.uwu.authenticationservice.dto.User
 import com.uwu.authenticationservice.entity.UserEntity
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -30,7 +31,7 @@ class JwtService {
 
     fun getSingInKey(): Key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSigningKey))
 
-    fun generateTokens(userDetails: UserEntity): ArrayList<String> {
+    fun generateTokens(userDetails: User): ArrayList<String> {
         logger.info("Beginning of generate token")
         val header = HashMap<String, Any>()
         header["typ"] = "JWT"
