@@ -80,7 +80,7 @@ class MailService(
         logger.info("Sending mail to verify is began")
 
         val mailVerification = mailVerifyRepository.getMailVerificationEntityByEmail(to)
-        val verificationCode = mailVerification.verificationCode!!
+        val verificationCode = mailVerification.verificationCode
         val message = SimpleMailMessage().apply {
             from = "no-reply@gmail.com"
             setTo(to)
