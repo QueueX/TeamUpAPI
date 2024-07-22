@@ -1,0 +1,105 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.uwu",
+    "module": "migration-service",
+    "version": "0.0.1-SNAPSHOT",
+    "attributes": {
+      "org.gradle.status": "integration"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.5"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "migration-service-0.0.1-SNAPSHOT-plain.jar",
+          "url": "migration-service-0.0.1-SNAPSHOT-plain.jar",
+          "size": 19949,
+          "sha512": "21fed232682b1703b2b26cb0f736b5ba97a783901d36a2e636fbd9ed2c3eaf72d2aa20e650d057028e3a3edf8118081ee053958f7fa1d3087f0f8459d718f5c6",
+          "sha256": "b3640a11a3484518a85995a1d9e05953b37229f2ce28e7a1603e79f5a9971f0d",
+          "sha1": "e6b019055d2251972e7ca7b40de31bb153d1195c",
+          "md5": "35c678887dde1f84f473db51b29db656"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-data-jpa"
+        },
+        {
+          "group": "org.flywaydb",
+          "module": "flyway-core"
+        },
+        {
+          "group": "org.flywaydb",
+          "module": "flyway-database-postgresql"
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-reflect",
+          "version": {
+            "requires": "1.9.24"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        },
+        {
+          "group": "org.postgresql",
+          "module": "postgresql"
+        }
+      ],
+      "files": [
+        {
+          "name": "migration-service-0.0.1-SNAPSHOT-plain.jar",
+          "url": "migration-service-0.0.1-SNAPSHOT-plain.jar",
+          "size": 19949,
+          "sha512": "21fed232682b1703b2b26cb0f736b5ba97a783901d36a2e636fbd9ed2c3eaf72d2aa20e650d057028e3a3edf8118081ee053958f7fa1d3087f0f8459d718f5c6",
+          "sha256": "b3640a11a3484518a85995a1d9e05953b37229f2ce28e7a1603e79f5a9971f0d",
+          "sha1": "e6b019055d2251972e7ca7b40de31bb153d1195c",
+          "md5": "35c678887dde1f84f473db51b29db656"
+        }
+      ]
+    }
+  ]
+}

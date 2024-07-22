@@ -1,7 +1,6 @@
 package com.uwu.authenticationservice.service
 
 import com.uwu.authenticationservice.dto.User
-import com.uwu.authenticationservice.entity.UserEntity
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import io.jsonwebtoken.Claims

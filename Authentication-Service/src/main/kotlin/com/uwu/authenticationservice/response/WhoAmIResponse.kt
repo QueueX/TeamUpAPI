@@ -1,7 +1,7 @@
 package com.uwu.authenticationservice.response
 
-import com.uwu.authenticationservice.entity.Role
-import com.uwu.authenticationservice.entity.UserEntity
+import com.uwu.migrationservice.entity.Role
+import com.uwu.migrationservice.entity.UserEntity
 import java.util.UUID
 
 data class WhoAmIResponse(

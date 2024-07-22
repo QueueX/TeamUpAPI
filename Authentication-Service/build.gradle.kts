@@ -17,6 +17,9 @@ java {
 
 repositories {
 	mavenCentral()
+	maven {
+		url = uri("${rootProject.rootDir}/local-repo")
+	}
 }
 
 extra["springCloudVersion"] = "2023.0.2"
@@ -48,6 +51,9 @@ dependencies {
 	// Logger
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+	// Entities
+	implementation("com.uwu:migration-service:1.0.0")
 }
 
 dependencyManagement {

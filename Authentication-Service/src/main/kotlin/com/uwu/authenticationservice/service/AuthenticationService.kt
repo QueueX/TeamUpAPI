@@ -2,8 +2,8 @@ package com.uwu.authenticationservice.service
 
 import com.uwu.authenticationservice.dto.MemberData
 import com.uwu.authenticationservice.dto.User
-import com.uwu.authenticationservice.entity.Role
-import com.uwu.authenticationservice.entity.UserEntity
+import com.uwu.migrationservice.entity.Role
+import com.uwu.migrationservice.entity.UserEntity
 import com.uwu.authenticationservice.repository.UserRepository
 import com.uwu.authenticationservice.request.AuthenticationRequest
 import com.uwu.authenticationservice.request.RegistrationRequest

@@ -1,6 +1,6 @@
 package com.uwu.authenticationservice.repository
 
-import com.uwu.authenticationservice.entity.UserEntity
+import com.uwu.migrationservice.entity.UserEntity
 import io.swagger.v3.oas.annotations.Hidden
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query

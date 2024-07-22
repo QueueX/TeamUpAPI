@@ -1,7 +1,7 @@
 package com.uwu.authenticationservice.dto
 
-import com.uwu.authenticationservice.entity.Role
-import com.uwu.authenticationservice.entity.UserEntity
+import com.uwu.migrationservice.entity.Role
+import com.uwu.migrationservice.entity.UserEntity
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails

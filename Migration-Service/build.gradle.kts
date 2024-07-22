@@ -4,10 +4,11 @@ plugins {
 	kotlin("plugin.jpa") version "1.9.24"
 	kotlin("jvm") version "1.9.24"
 	kotlin("plugin.spring") version "1.9.24"
+	id("maven-publish")
 }
 
 group = "com.uwu"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.0"
 
 java {
 	toolchain {
@@ -38,4 +39,23 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+publishing {
+	publications {
+		create<MavenPublication>("mavenJava") {
+			from(components["java"])
+
+			groupId = "com.uwu"
+			artifactId = "migration-service"
+			version = "1.0.0"
+		}
+	}
+
+	repositories {
+		maven {
+			name = "local"
+			url = uri("${rootProject.rootDir}/local-repo")
+		}
+	}
 }

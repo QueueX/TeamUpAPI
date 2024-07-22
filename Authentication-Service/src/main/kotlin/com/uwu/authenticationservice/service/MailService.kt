@@ -2,7 +2,7 @@ package com.uwu.authenticationservice.service
 
 import com.uwu.authenticationservice.dto.MemberData
 import com.uwu.authenticationservice.dto.User
-import com.uwu.authenticationservice.entity.MailVerifyEntity
+import com.uwu.migrationservice.entity.MailVerifyEntity
 import com.uwu.authenticationservice.repository.MailVerifyRepository
 import com.uwu.authenticationservice.repository.UserRepository
 import com.uwu.authenticationservice.request.MailVerifyRequest
