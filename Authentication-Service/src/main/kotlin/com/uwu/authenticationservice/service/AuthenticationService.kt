@@ -15,11 +15,14 @@ import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseCookie
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 
 @Service
 class AuthenticationService(
@@ -130,13 +133,15 @@ class AuthenticationService(
     }
 
     fun setRefreshToken(response: HttpServletResponse, user: UserEntity) {
-        val cookie = Cookie("refreshToken", user.refreshToken)
-        cookie.isHttpOnly = true
-        cookie.secure = true
-        cookie.path = "/"
-        cookie.maxAge = 30 * 24 * 60 * 60 // 30 дней
+        val cookie = ResponseCookie.from("refreshToken", user.refreshToken!!)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(Duration.ofDays(30))
+            .sameSite("None")
+            .build()
 
-        response.addCookie(cookie)
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
     }
 
     private fun isValidAuthenticationCredentials(request: AuthenticationRequest) =
