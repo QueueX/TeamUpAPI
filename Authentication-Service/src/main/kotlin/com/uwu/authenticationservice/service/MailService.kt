@@ -13,9 +13,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.random.Random
 
 @Service
 class MailService(
@@ -30,9 +30,7 @@ class MailService(
     fun sendVerificationCode(token: String): SimpleResponse {
         logger.info("Generation verification code")
         val email = jwtService.extractUsername(token.substring(7))
-        var verificationCode = ""
-
-        for (i in 1..6) verificationCode += Random.nextInt(0, 10).toString()
+        val verificationCode = generateVerificationCode(60)
 
         val mailVerification = MailVerifyEntity().apply {
             this.email = email
@@ -81,17 +79,24 @@ class MailService(
 
         val mailVerification = mailVerifyRepository.getMailVerificationEntityByEmail(to)
         val verificationCode = mailVerification.verificationCode
-        val message = SimpleMailMessage().apply {
-            from = "no-reply@gmail.com"
-            setTo(to)
-            subject = "Подтверждение e-mail"
-            text = verificationMailTextGenerate(verificationCode)
-        }
+
+        val message = mailSender.createMimeMessage()
+        val helper = MimeMessageHelper(message, true, "UTF-8")
+
+        helper.setFrom("no-reply@gmail.com")
+        helper.setTo(to)
+        helper.setSubject("Подтверждение e-mail")
+        helper.setText(MailGenerator.verificationMailTextGenerate(verificationCode), true) // true for HTML
+
         mailSender.send(message)
         logger.debug("Mail to $to has been sent")
         logger.info("Sending mail is successful")
     }
 
-    private fun verificationMailTextGenerate(verificationCode: String) = "Ваш код для подтверждения e-mail: $verificationCode"
-
+    fun generateVerificationCode(length: Int): String {
+        val chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        return (1..length)
+            .map { chars.random() }
+            .joinToString("")
+    }
 }
