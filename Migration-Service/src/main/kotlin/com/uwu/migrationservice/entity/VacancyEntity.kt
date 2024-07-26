@@ -16,6 +16,4 @@ class VacancyEntity {
     @Column(nullable = false)
     lateinit var about: String
 
-
-
 }

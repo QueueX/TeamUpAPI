@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.uwu"
-version = "1.0.0"
+version = "1.1.0"
 
 java {
 	toolchain {
@@ -48,7 +48,7 @@ publishing {
 
 			groupId = "com.uwu"
 			artifactId = "migration-service"
-			version = "1.0.0"
+			version = "1.1.0"
 		}
 	}
 

@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS "users" (
     "is_activated" boolean NOT NULL,
     "password" text NOT NULL,
     "role" varchar(5) NOT NULL,
-    "refresh_token" text NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -35,7 +34,7 @@ CREATE TABLE IF NOT EXISTS "verification_codes" (
 CREATE TABLE IF NOT EXISTS "refresh_tokens" (
     "id" uuid NOT NULL UNIQUE,
     "user" uuid NOT NULL ,
-    "token" uuid NOT NULL UNIQUE,
+    "token" text NOT NULL UNIQUE,
     CONSTRAINT "refresh_tokens_fk1" FOREIGN KEY ("user") REFERENCES "users"("id")
 );
 

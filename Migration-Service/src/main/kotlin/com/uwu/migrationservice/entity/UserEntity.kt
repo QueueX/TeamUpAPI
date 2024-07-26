@@ -31,7 +31,4 @@ class UserEntity {
     @Column(nullable = false, unique = false)
     lateinit var role: Role
 
-    @Column(unique = true, nullable = true)
-    var refreshToken: String? = null
-
 }
