@@ -11,7 +11,6 @@ import com.uwu.authenticationservice.response.SimpleResponse
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Service
@@ -27,7 +26,7 @@ class MailService(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(MailService::class.java)
 
-    fun sendVerificationCode(token: String): SimpleResponse {
+    fun sendEmailVerificationCode(token: String): SimpleResponse {
         logger.info("Generation verification code")
         val email = jwtService.extractUsername(token.substring(7))
         val verificationCode = generateVerificationCode(60)
@@ -45,7 +44,7 @@ class MailService(
     }
 
     @Transactional
-    fun verifyByCode(token: String, mailVerifyRequest: MailVerifyRequest, response: HttpServletResponse): MailVerifyResponse {
+    fun verifyEmailByCode(token: String, mailVerifyRequest: MailVerifyRequest, response: HttpServletResponse): MailVerifyResponse {
         val email = jwtService.extractUsername(token.substring(7))
         val mailVerify = mailVerifyRepository.getMailVerificationEntityByEmail(email)
 
@@ -86,7 +85,7 @@ class MailService(
         helper.setFrom("no-reply@gmail.com")
         helper.setTo(to)
         helper.setSubject("Подтверждение e-mail")
-        helper.setText(MailGenerator.verificationMailTextGenerate(verificationCode), true) // true for HTML
+        helper.setText(MailGenerator.mailVerification(verificationCode), true) // true for HTML
 
         mailSender.send(message)
         logger.debug("Mail to $to has been sent")

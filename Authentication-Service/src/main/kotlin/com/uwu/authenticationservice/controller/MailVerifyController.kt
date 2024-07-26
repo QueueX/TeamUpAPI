@@ -1,5 +1,6 @@
 package com.uwu.authenticationservice.controller
 
+import com.uwu.authenticationservice.request.MailRecoveryVerifyCode
 import com.uwu.authenticationservice.request.MailVerifyRequest
 import com.uwu.authenticationservice.response.MailVerifyResponse
 import com.uwu.authenticationservice.response.SimpleResponse
@@ -23,22 +24,27 @@ class MailVerifyController(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(MailVerifyController::class.java)
 
-    @PostMapping("/send-code")
+    @PostMapping("/send-verify-code")
     @Operation(summary = "Генерация и отправка кода верификации на почту клиента")
-    fun sendVerificationCode(@RequestHeader(value = "Authorization") token: String): ResponseEntity<SimpleResponse> {
+    fun sendEmailVerificationCode(@RequestHeader(value = "Authorization") token: String): ResponseEntity<SimpleResponse> {
         logger.info("Request to sending verification code")
-        return ResponseEntity.ok(mailService.sendVerificationCode(token))
+        return ResponseEntity.ok(mailService.sendEmailVerificationCode(token))
     }
+
+//    fun sendRecoveryCode(@RequestBody mailRecoveryVerifyCode: MailRecoveryVerifyCode) : ResponseEntity<SimpleResponse> {
+//        logger.info("Request to sending recovery code")
+//        ResponseEntity.ok()
+//    }
 
     @PostMapping("/verify")
     @Operation(summary = "Верификация пользователя по коду")
-    fun verifyByCode(
+    fun verifyEmailByCode(
         @RequestHeader(value = "Authorization") token: String,
         @RequestBody request: MailVerifyRequest,
         response: HttpServletResponse
     ): ResponseEntity<MailVerifyResponse> {
         logger.info("Request to verify")
-        return ResponseEntity.ok(mailService.verifyByCode(token, request, response))
+        return ResponseEntity.ok(mailService.verifyEmailByCode(token, request, response))
     }
 
     @ExceptionHandler

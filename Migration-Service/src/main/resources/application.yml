@@ -3,15 +3,15 @@ spring:
     name: Migration-Service
   datasource:
 #        ????????? ???? ??????
-        url: jdbc:postgresql://my-teamup.ru:5432/TeamUp
-        username: TeamUp
-        password: guewhprihdfjhsargoheusdweufhui2389yf2uy892f3
-        driver-class-name: org.postgresql.Driver
+#        url: jdbc:postgresql://my-teamup.ru:5432/TeamUp
+#        username: TeamUp
+#        password: guewhprihdfjhsargoheusdweufhui2389yf2uy892f3
+#        driver-class-name: org.postgresql.Driver
 
 #        ????????? ???? ??????
-#    url: jdbc:postgresql://localhost:5432/TeamUp
-#    username: postgres
-#    password: postgres
-#    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/TeamUp
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
 server:
   port: 8100

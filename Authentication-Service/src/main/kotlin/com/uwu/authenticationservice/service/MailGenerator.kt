@@ -5,79 +5,86 @@ import org.springframework.stereotype.Service
 @Service
 class MailGenerator {
     companion object {
-        fun verificationMailTextGenerate(verificationCode: String) =
-            "<!DOCTYPE html>\n" +
-                    "<html lang=\"ru\">\n" +
-                    "<head>\n" +
-                    "    <meta charset=\"UTF-8\">\n" +
-                    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                    "    <title>Подтверждение почты</title>\n" +
-                    "    <style>\n" +
-                    "        body {\n" +
-                    "            font-family: Arial, sans-serif;\n" +
-                    "            background-color: #f7f4fc;\n" +
-                    "            margin: 0;\n" +
-                    "            padding: 0;\n" +
-                    "            color: #333;\n" +
-                    "        }\n" +
-                    "        .container {\n" +
-                    "            max-width: 600px;\n" +
-                    "            margin: 0 auto;\n" +
-                    "            background-color: #fff;\n" +
-                    "            border-radius: 10px;\n" +
-                    "            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\n" +
-                    "            overflow: hidden;\n" +
-                    "        }\n" +
-                    "        .header {\n" +
-                    "            background-color: #e0d7f3;\n" +
-                    "            padding: 20px;\n" +
-                    "            text-align: center;\n" +
-                    "        }\n" +
-                    "        .content {\n" +
-                    "            padding: 20px;\n" +
-                    "            text-align: center;\n" +
-                    "        }\n" +
-                    "        .content h1 {\n" +
-                    "            color: #6a4b8a;\n" +
-                    "        }\n" +
-                    "        .content p {\n" +
-                    "            margin: 20px 0;\n" +
-                    "            color: #6a4b8a;\n" +
-                    "        }\n" +
-                    "        .button {\n" +
-                    "            display: inline-block;\n" +
-                    "            padding: 15px 25px;\n" +
-                    "            font-size: 16px;\n" +
-                    "            color: #fff;\n" +
-                    "            background-color: #a18cd1;\n" +
-                    "            border-radius: 5px;\n" +
-                    "            text-decoration: none;\n" +
-                    "        }\n" +
-                    "        .footer {\n" +
-                    "            background-color: #e0d7f3;\n" +
-                    "            padding: 10px;\n" +
-                    "            text-align: center;\n" +
-                    "            font-size: 12px;\n" +
-                    "            color: #6a4b8a;\n" +
-                    "        }\n" +
-                    "    </style>\n" +
-                    "</head>\n" +
-                    "<body>\n" +
-                    "    <div class=\"container\">\n" +
-                    "        <div class=\"header\">\n" +
-                    "            <img src=\"https://i.postimg.cc/63fKThwW/image.png\" alt=\"Логотип\">\n" +
-                    "        </div>\n" +
-                    "        <div class=\"content\">\n" +
-                    "            <h1>Подтверждение почты</h1>\n" +
-                    "            <p>Нажмите на кнопку чтобы подтвердить свою учетную запись</p>\n" +
-                    "            <a href=\"https://my-teamup.ru/confirm/mail?token=${verificationCode}\" class=\"button\">Подтвердить</a>\n" +
-                    "        </div>\n" +
-                    "        <div class=\"footer\">\n" +
-                    "            &copy; 2024 TeamUp by UwU. Все права защищены.\n" +
-                    "        </div>\n" +
-                    "    </div>\n" +
-                    "</body>\n" +
-                    "</html>\n"
+        fun mailVerification(verificationCode: String) = """
+                <!DOCTYPE html>
+                <html lang="en">
+                  <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>Mail</title>
+                  </head>
+                  <body style="padding: 30px 0; background: linear-gradient(60deg, #daf5ff, #ecdef8); background-repeat: no-repeat; text-align: center; font-family: Arial, Helvetica, sans-serif;">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%">
+                      <tr>
+                        <td style="text-align: center; padding-bottom: 20px;">
+                          <img src="https://i.postimg.cc/63fKThwW/image.png" alt="logo" style="max-width: 100%; height: auto;" />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 15px;">
+                            <tr>
+                              <td style="padding: 10px 20px;">
+                                <h2 style="font-weight: 1000; font-size: 28px; margin-bottom: 10px; color: #1c0fb1; text-align: center;">Подтверждение почты</h2>
+                                <p style="font-size: 16px; color: #2d164a; text-align: center;">Нажмите чтобы подтвердить учётную запись</p>
+                                <div style="padding: 15px 25px; background-color: #1c0fb1; color: #fff; font-size: 22px; border-radius: 10px; margin-bottom: 10px; width: 220px; margin: 10px auto; text-align: center;">
+                                  <a href="https://my-teamup.ru/confirm/mail?token=${verificationCode}" style="color: inherit; text-decoration: none;">Подтвердить</a>
+                                </div>
+                                <p style="font-size: 16px; color: #2d164a; text-align: center;">Если вы не запрашивали письмо подтверждения почты - пожалуйста проигнорируйте</p>
+                                <footer style="font-size: 16px; text-align: center; margin-top: 20px;">
+                                  <p>&copy; 2024 TeamUp by UwU. Все права защищены.</p>
+                                </footer>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </body>
+                </html>
+            """
+
+        fun codeForPasswordChanging(verificationCode: String) = ""
+
+        fun codeForPasswordRepair(verificationCode: String) = """
+                <!DOCTYPE html>
+                <html lang="en">
+                  <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>Mail</title>
+                  </head>
+                  <body style="padding: 30px 0; background: linear-gradient(60deg, #daf5ff, #ecdef8); background-repeat: no-repeat; text-align: center; font-family: Arial, Helvetica, sans-serif;">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%">
+                      <tr>
+                        <td style="text-align: center; padding-bottom: 20px;">
+                          <img src="https://i.postimg.cc/63fKThwW/image.png" alt="logo" style="max-width: 100%; height: auto;" />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 15px;">
+                            <tr>
+                              <td style="padding: 20px; text-align: center;">
+                                <h2 style="font-weight: 1000; font-size: 28px; margin-bottom: 10px; color: #1c0fb1; text-align: center;">Восстановление пароля</h2>
+                                <p style="font-size: 16px; color: #2d164a; text-align: center;">Ваш код восстановления пароля</p>
+                                <div style="padding: 15px 25px; background-color: #1c0fb1; color: #fff; font-size: 22px; border-radius: 10px; margin-bottom: 10px; width: 220px; margin: 10px auto; text-align: center;">
+                                  <p style="font-weight: 1000; font-size: 28px; margin: 0;">123456</p>
+                                </div>
+                                <p style="font-size: 16px; color: #2d164a; text-align: center;">Если вы не запрашивали письмо с кодом восстановления - пожалуйста проигнорируйте</p>
+                                <footer style="font-size: 16px; text-align: center; margin-top: 20px;">
+                                  <p>&copy; 2024 TeamUp by UwU. Все права защищены.</p>
+                                </footer>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </body>
+                </html>
+            """
+
     }
 
 }
