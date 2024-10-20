@@ -2,6 +2,7 @@ package com.uwu.authenticationservice.service
 
 import com.uwu.authenticationservice.dto.MemberData
 import com.uwu.authenticationservice.dto.User
+import com.uwu.authenticationservice.repository.RefreshTokensRepository
 import com.uwu.migrationservice.entity.Role
 import com.uwu.migrationservice.entity.UserEntity
 import com.uwu.authenticationservice.repository.UserRepository
@@ -9,6 +10,7 @@ import com.uwu.authenticationservice.request.AuthenticationRequest
 import com.uwu.authenticationservice.request.RegistrationRequest
 import com.uwu.authenticationservice.response.AuthenticationResponse
 import com.uwu.authenticationservice.response.SimpleResponse
+import com.uwu.migrationservice.entity.RefreshTokensEntity
 import jakarta.mail.internet.AddressException
 import jakarta.mail.internet.InternetAddress
 import jakarta.servlet.http.Cookie
@@ -29,7 +31,8 @@ class AuthenticationService(
     private val userRepository: UserRepository,
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
+    private val refreshTokensRepository: RefreshTokensRepository
 ) {
     private val logger: Logger = LoggerFactory.getLogger(AuthenticationService::class.java)
 
@@ -48,9 +51,13 @@ class AuthenticationService(
 
         val tokens = jwtService.generateTokens(userDetails)
 
-        user.refreshToken = tokens[1]
-        userRepository.save(user)
-        setRefreshToken(response, user)
+        val tokensEntity = RefreshTokensEntity().apply {
+            this.user = user
+            this.token = tokens[1]
+        }
+        refreshTokensRepository.save(tokensEntity)
+
+        setRefreshToken(response, tokens[1])
 
         return AuthenticationResponse(tokens[0], MemberData.of(user))
     }
@@ -78,15 +85,20 @@ class AuthenticationService(
             this.lastname = request.lastname
             this.isActivated = false
             this.role = Role.USER
-            this.refreshToken = null
         }
 
         val userDetails = User.of(user)
 
         val tokens = jwtService.generateTokens(userDetails)
-        user.refreshToken = tokens[1]
+
         userRepository.save(user)
-        setRefreshToken(response, user)
+        setRefreshToken(response, tokens[1])
+
+        val tokensEntity = RefreshTokensEntity().apply {
+            this.user = user
+            this.token = tokens[1]
+        }
+        refreshTokensRepository.save(tokensEntity)
 
         logger.debug("User with email ${user.email} has been created")
         logger.info("Registration is successful!")
@@ -95,8 +107,8 @@ class AuthenticationService(
     }
 
     fun logout(token: String, response: HttpServletResponse): SimpleResponse {
-        val user = userRepository.findByEmail(jwtService.extractUsername(token))
-        user.refreshToken = null
+        val tokensEntity = refreshTokensRepository.findRefreshTokensEntityByToken(token)
+        refreshTokensRepository.delete(tokensEntity)
 
         val cookie = Cookie("refreshToken", null)
         cookie.maxAge = 0
@@ -115,25 +127,29 @@ class AuthenticationService(
 
         val user = userRepository.findByEmail(jwtService.extractUsername(token))
 
-        if (user.refreshToken != token) {
-            logger.error("")
+        if (refreshTokensRepository.findAllTokens().contains(token)) {
+            logger.error("Token not valid")
             throw Exception("Token not valid")
         }
 
         val userDetails = User.of(user)
 
         val tokens = jwtService.generateTokens(userDetails)
-        user.refreshToken = tokens[1]
+
+        refreshTokensRepository.save(
+            RefreshTokensEntity(tokens[1])
+        )
+
         userRepository.save(user)
-        setRefreshToken(response, user)
+        setRefreshToken(response, user, tokens[1])
 
         logger.debug("Token of user ${user.email} is refreshed")
 
         return AuthenticationResponse(tokens[0], MemberData.of(user))
     }
 
-    fun setRefreshToken(response: HttpServletResponse, user: UserEntity) {
-        val cookie = ResponseCookie.from("refreshToken", user.refreshToken!!)
+    fun setRefreshToken(response: HttpServletResponse, token: String) {
+        val cookie = ResponseCookie.from("refreshToken", token)
             .httpOnly(true)
             .secure(true)
             .path("/")

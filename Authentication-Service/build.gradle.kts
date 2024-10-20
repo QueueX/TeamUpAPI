@@ -53,7 +53,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
 	// Entities
-	implementation("com.uwu:migration-service:1.0.0")
+	implementation("com.uwu:migration-service:1.1.0")
 }
 
 dependencyManagement {
